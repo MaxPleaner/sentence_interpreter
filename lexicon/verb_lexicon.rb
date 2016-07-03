@@ -1,0 +1,3 @@
+VerbLexicon = {
+  # visit: nil
+}
