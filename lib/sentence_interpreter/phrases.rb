@@ -1,5 +1,5 @@
-require './lib/verbs.rb'
-require './lib/nouns.rb'
+require './lib/sentence_interpreter/verbs'
+require './lib/sentence_interpreter/nouns'
 
 class NounBeforeVerbError < StandardError
 end

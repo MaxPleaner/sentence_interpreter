@@ -1,4 +1,4 @@
-require './lexicon/noun_lexicon'
+require './lib/lexicon/noun_lexicon'
 
 class Nouns
   def self.include?(word)

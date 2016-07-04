@@ -1,8 +1,8 @@
-require './lib/phrases.rb'
+require './lib/sentence_interpreter/phrases'
 
 class SentenceInterpreter
   
-  def self.parse(sentece='')
+  def self.interpret(sentence='')
     Phrases.new(sentence)
   end
   

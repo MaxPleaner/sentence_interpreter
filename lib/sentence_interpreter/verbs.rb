@@ -1,4 +1,4 @@
-require './lexicon/verb_lexicon'
+require './lib/lexicon/verb_lexicon'
 
 class Verbs
   def self.include?(word)
