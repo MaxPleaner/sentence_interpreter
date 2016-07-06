@@ -1,38 +1,58 @@
-## How to run:
+### sentence_interpreter gem
 
-This file can be run from the command line.
+#### Installation
 
-```shell
-ruby sentence_interpreter.rb <sentence>
-```
+`gem install sentence_interpreter`
 
-#### Rules
-
-- Nouns must have a preceeding verb
-- When a verb is found, it becomes the 'verb' for the phrase and the rest
-  of the nouns (until the next verb) become the nouns of the phrase
-- `nouns` and `verbs` are defined as those included in `lexicon/`. All other words will be ignored.
-
-#### Examples
-
-```shell
-Sentence="search google for roses"
-ruby sentence_interpreter $Sentence
-```
-
-The sentence will be parsed into all Verb Noun phrases
-given the definitions provided in lexicon/
-
-Because of the verb-first rule, `"Visit website gmail"` is fine
-but `"gmail visit"` is not ok.
-
-`"Visit gmail inbox and visit Github inbox"` would be a valid example of a sentence with two Verb Noun phrases. The results would be:
+#### Usage
 
 ```ruby
-   [
-     { verb: "visit", nouns: ["gmail", "inbox"] },
-     { verb: "visit", nouns: ["github", "inbox"]
-   ]
+require 'sentence_interpreter'
+VerbLexicon[:print] = true 
+NounLexicon[:hello] = true
+SentenceInterpreter.interpret("print hello")
+# => [ { verb: :print, nouns: ["hello"] } ]
 ```
 
-The script will output this in JSON stringified form.
+In the `VerbLexicon` and `NounLexicon` hashes, the values can be any truthy value so the word is considered "defined". For example, it could be a proc which can be evaluated:
+
+```ruby
+class Symbol
+  def eval_noun
+    NounLexicon[self].call
+  end
+end
+
+VerbLexicon[:print] = ->(*nouns) { print nouns.map(&:eval_noun).join(" ") }
+NounLexicon[:hello] = ->() { "hello" }
+SentenceInterpreter.interpret("print hello").each do |cmd|
+  cmd[:verb].call(*cmd[:nouns])
+end
+# => "hello"
+```
+The following rules will explain the functionality a little clearer:
+
+- a "phrase" is considered a verb followed by any number of nouns.
+- verbs and nouns are defined as the keys of the `NounLexicon` or `VerbLexicon` hashes.
+- All words other than the verbs and nouns are ignored
+
+Some more examples:
+
+```ruby
+VerbLexicon[:visit] = true
+NounLexicon[:website] = true
+NounLexicon[:github] = true
+
+SentenceInterpreter.interpret("visit website github")
+# => [{ verb: :visit, nouns: ["website", "github"] }]
+
+begin
+  SentenceInterpreter.interpret("github visit")
+rescue NounBeforeVerbError => e
+  puts "This error was called because the noun (github) comes before the verb (visit)
+end
+
+SentenceInterpreter.interpret("visit website github and visit github website")
+# => [{verb: :visit, nouns: ["website", "github"]}, {verb: :visit, nouns: ["github", "website"]}]
+
+```
