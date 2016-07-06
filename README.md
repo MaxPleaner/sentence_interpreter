@@ -49,7 +49,8 @@ SentenceInterpreter.interpret("visit website github")
 begin
   SentenceInterpreter.interpret("github visit")
 rescue NounBeforeVerbError => e
-  puts "This error was called because the noun (github) comes before the verb (visit)
+  puts "error"
+  # This error was called because the noun (github) comes before the verb (visit)
 end
 
 SentenceInterpreter.interpret("visit website github and visit github website")
