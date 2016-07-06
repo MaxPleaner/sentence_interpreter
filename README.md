@@ -23,11 +23,15 @@ class Symbol
   end
 end
 
-VerbLexicon[:print] = ->(*nouns) { print nouns.map(&:eval_noun).join(" ") }
-NounLexicon[:hello] = ->() { "hello" }
-SentenceInterpreter.interpret("print hello").each do |cmd|
-  cmd[:verb].call(*cmd[:nouns])
+class Array
+  def run_commands
+    each { |cmd| cmd[:verb].call *(cmd[:nouns].map(&:eval_noun)) }
+  end
 end
+
+VerbLexicon[:print] = ->(*args) { print args }
+NounLexicon[:hello] = ->() { "hello" }
+SentenceInterpreter.interpret("print hello").run_commands
 # => "hello"
 ```
 The following rules will explain the functionality a little clearer:
