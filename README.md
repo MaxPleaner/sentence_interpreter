@@ -17,21 +17,24 @@ SentenceInterpreter.interpret("print hello")
 In the `VerbLexicon` and `NounLexicon` hashes, the values can be any truthy value so the word is considered "defined". For example, it could be a proc which can be evaluated:
 
 ```ruby
-class Symbol
-  def eval_noun
-    NounLexicon[self].call
+  require 'sentence_interpreter'
+  
+  class String
+    def eval_noun
+     NounLexicon[self.to_sym].call
+    end
   end
-end
-
-class Array
-  def run_commands
-    each { |cmd| cmd[:verb].call *(cmd[:nouns].map(&:eval_noun)) }
+  
+  class Array
+    def run_commands
+      map { |cmd| VerbLexicon[cmd[:verb].to_sym].call *(cmd[:nouns].map(&:eval_noun)) }
+      .join("\n")
+    end
   end
-end
-
-VerbLexicon[:print] = ->(*args) { print args }
-NounLexicon[:hello] = ->() { "hello" }
-SentenceInterpreter.interpret("print hello").run_commands
+  
+  VerbLexicon[:print] = ->(*args) { print args.join(" ") }
+  NounLexicon[:hello] = ->() { "hello" }
+  SentenceInterpreter.interpret("print hello").run_commands
 # => "hello"
 ```
 The following rules will explain the functionality a little clearer:
@@ -43,6 +46,8 @@ The following rules will explain the functionality a little clearer:
 Some more examples:
 
 ```ruby
+require 'sentence_interpreter'
+
 VerbLexicon[:visit] = true
 NounLexicon[:website] = true
 NounLexicon[:github] = true
