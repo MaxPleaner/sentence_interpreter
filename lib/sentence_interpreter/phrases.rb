@@ -6,7 +6,7 @@ end
 
 class Phrases
   def self.new(sentence='')
-    sentence.downcase.split(" ").reduce([]) do |phrases, word|
+    sentence.split(" ").reduce([]) do |phrases, word|
       phrases.tap do |phrases|
         if Verbs.include?(word)
           phrases << {verb: word}
